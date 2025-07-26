@@ -5,6 +5,8 @@ import random
 import string
 import socket
 import os
+import re
+from datetime import datetime
 
 def limpar():
     os.system('clear' if os.name == 'posix' else 'cls')
@@ -23,6 +25,7 @@ def menu():
 [2] Gerar senha segura
 [3] Verificar portas abertas em host
 [4] Ver meu IP público
+[5] Analisar replay OTC (IQ Option)
 [0] Sair
 """)
 
@@ -61,6 +64,25 @@ def meu_ip():
     except:
         print("Erro ao buscar IP.")
 
+def analisar_replay():
+    caminho = input("Caminho do arquivo de replay: ")
+    if not os.path.isfile(caminho):
+        print("Arquivo não encontrado.")
+        return
+    with open(caminho, "r", encoding="utf-8", errors="ignore") as f:
+        conteudo = f.read()
+    match = re.search(r"(\d{4}-\d{2}-\d{2})", conteudo)
+    if not match:
+        print("Data n\u00e3o encontrada no arquivo.")
+        return
+    data_str = match.group(1)
+    try:
+        data = datetime.strptime(data_str, "%Y-%m-%d")
+        dia_semana = data.strftime("%A")
+        print(f"Data encontrada: {data_str} - {dia_semana}")
+    except ValueError:
+        print(f"Formato de data inesperado: {data_str}")
+
 def main():
     while True:
         limpar()
@@ -75,6 +97,8 @@ def main():
             scan_portas()
         elif op == '4':
             meu_ip()
+        elif op == '5':
+            analisar_replay()
         elif op == '0':
             print("Saindo...")
             break
